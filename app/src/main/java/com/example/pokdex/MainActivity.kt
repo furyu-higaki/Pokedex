@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             if (it.isEmpty()) return@observe
 
             binding.pokemonsLinearLayout.removeAllViews()
-
+            
             it.forEach { pokemon ->
                 val horizontalLayout = LinearLayout(this)
                 horizontalLayout.orientation = LinearLayout.HORIZONTAL

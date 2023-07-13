@@ -1,5 +1,6 @@
 package com.example.pokdex.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.pokdex.model.Pokemon
@@ -12,10 +13,12 @@ class PokemonListViewModel : ViewModel() {
 
     private val pokemonRepository = PokemonRepository()
 
-    val pokemonList = MutableLiveData<List<Pokemon>>()
+    private val _pokemonList = MutableLiveData<List<Pokemon>>()
+    val pokemonList: LiveData<List<Pokemon>>
+        get() = _pokemonList
 
     fun fetchPokemons(range: IntRange) {
-        val pokemonData = pokemonList.value?.toMutableList() ?: mutableListOf()
+        val pokemonData = _pokemonList.value?.toMutableList() ?: mutableListOf()
 
         range.forEach { id ->
             pokemonRepository.fetchPokemon(id).enqueue(object : Callback<Pokemon> {
@@ -24,7 +27,8 @@ class PokemonListViewModel : ViewModel() {
                     pokemon?.let {
                         pokemonData.add(it)
                         pokemonData.sortBy { pokemon -> pokemon.id }
-                        pokemonList.postValue(pokemonData)
+                        pokemonData.distinctBy { pokemon -> pokemon.id }
+                         _pokemonList.postValue(pokemonData)
                     }
                 }
 
