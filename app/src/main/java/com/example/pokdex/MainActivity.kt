@@ -2,12 +2,11 @@ package com.example.pokdex
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pokdex.databinding.ActivityMainBinding
+import com.example.pokdex.ui.pokemon.PokemonAdapter
+import com.example.pokdex.ui.pokemon.PokemonDetailActivity
 import com.example.pokdex.viewmodel.PokemonListViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -20,34 +19,23 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this).get(PokemonListViewModel::class.java)
     }
 
+    private val pokemonAdapter by lazy {
+        PokemonAdapter { startActivity(PokemonDetailActivity.newIntent(this, it)) }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        binding.recyclerView.apply {
+            adapter = pokemonAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
         viewModel.pokemonList.observe(this) {
             if (it.isEmpty()) return@observe
 
-            binding.pokemonsLinearLayout.removeAllViews()
-            
-            it.forEach { pokemon ->
-                val horizontalLayout = LinearLayout(this)
-                horizontalLayout.orientation = LinearLayout.HORIZONTAL
-
-                val imageView = ImageView(this)
-                Glide.with(this).load(pokemon.sprites.frontDefault).into(imageView)
-                horizontalLayout.addView(imageView, 300, 300)
-
-                val textView = TextView(this)
-                textView.text = pokemon.name
-                textView.gravity = android.view.Gravity.CENTER_VERTICAL
-                horizontalLayout.addView(textView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-
-                horizontalLayout.setOnClickListener {
-                    startActivity(PokemonDetailActivity.newIntent(this, pokemon))
-                }
-
-                binding.pokemonsLinearLayout.addView(horizontalLayout)
-            }
+            pokemonAdapter.submitList(it)
         }
 
         binding.addButton.setOnClickListener {

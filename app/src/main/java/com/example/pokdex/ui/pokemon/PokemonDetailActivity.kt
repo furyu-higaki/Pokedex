@@ -1,4 +1,4 @@
-package com.example.pokdex
+package com.example.pokdex.ui.pokemon
 
 import android.content.Context
 import android.content.Intent

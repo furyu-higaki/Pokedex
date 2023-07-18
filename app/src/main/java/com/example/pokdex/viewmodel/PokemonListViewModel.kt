@@ -28,7 +28,7 @@ class PokemonListViewModel : ViewModel() {
                         pokemonData.add(it)
                         pokemonData.sortBy { pokemon -> pokemon.id }
                         pokemonData.distinctBy { pokemon -> pokemon.id }
-                         _pokemonList.postValue(pokemonData)
+                        _pokemonList.postValue(pokemonData)
                     }
                 }
 
